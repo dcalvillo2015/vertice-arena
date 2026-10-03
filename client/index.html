@@ -1,0 +1,292 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Vértice Arena</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <script type="importmap">
+    { "imports": { "three": "/vendor/three.module.js" } }
+  </script>
+</head>
+<body>
+  <canvas id="menu-plan" aria-hidden="true"></canvas>
+
+  <!-- ============ MENÚ PRINCIPAL ============ -->
+  <section id="screen-main" class="screen active">
+    <div class="brand">
+      <svg class="vertex-mark" viewBox="0 0 120 64" aria-hidden="true">
+        <path d="M4 6 L60 58 L60 30 Z" fill="var(--cobalt)"/>
+        <path d="M116 6 L60 58 L60 30 Z" fill="var(--amber)"/>
+      </svg>
+      <h1 class="wordmark">Vértice<br>Arena</h1>
+      <p class="tagline">Shooter por equipos en el navegador. Juega con amigos o contra bots que piensan.</p>
+    </div>
+
+    <div class="main-col">
+      <label class="field">
+        <span>Tu nombre</span>
+        <input id="player-name" maxlength="16" autocomplete="nickname" placeholder="Jugador">
+      </label>
+      <nav class="menu-list" aria-label="Menú principal">
+        <button class="menu-item big" data-go="screen-bots">Jugar contra bots</button>
+        <button class="menu-item online-only" data-go="screen-create">Crear sala con amigos</button>
+        <button class="menu-item online-only" data-go="screen-join">Unirse con código</button>
+        <button class="menu-item" data-go="screen-settings">Ajustes</button>
+        <button class="menu-item" data-go="screen-controls">Controles</button>
+      </nav>
+      <p id="conn-status" class="conn">Conectando…</p>
+    </div>
+  </section>
+
+  <!-- ============ JUGAR CONTRA BOTS ============ -->
+  <section id="screen-bots" class="screen">
+    <div class="panel">
+      <h2>Jugar contra bots</h2>
+      <form id="form-bots" class="setup">
+        <fieldset class="seg" data-name="mode">
+          <legend>Modo</legend>
+          <label><input type="radio" name="mode" value="tdm_bots" checked><span>TDM contra bots</span></label>
+          <label><input type="radio" name="mode" value="tdm"><span>Team Deathmatch</span></label>
+          <label><input type="radio" name="mode" value="ffa"><span>Free For All</span></label>
+          <label><input type="radio" name="mode" value="gungame"><span>Gun Game</span></label>
+        </fieldset>
+        <p class="hint" id="bots-mode-hint"></p>
+        <fieldset class="seg maps" data-name="mapId">
+          <legend>Mapa</legend>
+        </fieldset>
+        <div class="row2">
+          <label class="field">
+            <span>Número de bots <output id="bots-count-out">5</output></span>
+            <input type="range" name="botCount" min="1" max="11" value="5" id="bots-count">
+          </label>
+          <label class="field">
+            <span>Duración</span>
+            <select name="timeLimit">
+              <option value="300">5 minutos</option>
+              <option value="480" selected>8 minutos</option>
+              <option value="600">10 minutos</option>
+              <option value="900">15 minutos</option>
+            </select>
+          </label>
+        </div>
+        <fieldset class="seg" data-name="botDifficulty">
+          <legend>Dificultad</legend>
+          <label><input type="radio" name="botDifficulty" value="easy"><span>Fácil</span></label>
+          <label><input type="radio" name="botDifficulty" value="normal" checked><span>Normal</span></label>
+          <label><input type="radio" name="botDifficulty" value="hard"><span>Difícil</span></label>
+          <label><input type="radio" name="botDifficulty" value="expert"><span>Experto</span></label>
+          <label><input type="radio" name="botDifficulty" value="mixed"><span>Mixta</span></label>
+        </fieldset>
+        <p class="hint" id="bots-diff-hint"></p>
+        <fieldset class="seg weapons" data-name="primary">
+          <legend>Arma principal</legend>
+        </fieldset>
+        <div class="actions">
+          <button type="button" class="ghost" data-go="screen-main">Volver</button>
+          <button type="submit" class="cta">Empezar partida</button>
+        </div>
+      </form>
+    </div>
+  </section>
+
+  <!-- ============ CREAR SALA ============ -->
+  <section id="screen-create" class="screen">
+    <div class="panel">
+      <h2>Crear sala</h2>
+      <form id="form-create" class="setup">
+        <fieldset class="seg" data-name="mode">
+          <legend>Modo</legend>
+          <label><input type="radio" name="mode" value="tdm" checked><span>Team Deathmatch</span></label>
+          <label><input type="radio" name="mode" value="ffa"><span>Free For All</span></label>
+          <label><input type="radio" name="mode" value="gungame"><span>Gun Game</span></label>
+          <label><input type="radio" name="mode" value="tdm_bots"><span>Amigos contra bots</span></label>
+        </fieldset>
+        <fieldset class="seg maps" data-name="mapId">
+          <legend>Mapa</legend>
+        </fieldset>
+        <div class="row2">
+          <label class="field">
+            <span>Plazas de la partida <output id="create-max-out">8</output></span>
+            <input type="range" name="maxPlayers" min="2" max="12" value="8" id="create-max">
+          </label>
+          <label class="field">
+            <span>Bots enemigos (modo contra bots) <output id="create-bots-out">6</output></span>
+            <input type="range" name="botCount" min="1" max="11" value="6" id="create-bots">
+          </label>
+        </div>
+        <label class="check"><input type="checkbox" name="fillBots" checked> Rellenar plazas vacías con bots</label>
+        <fieldset class="seg" data-name="botDifficulty">
+          <legend>Dificultad de los bots</legend>
+          <label><input type="radio" name="botDifficulty" value="easy"><span>Fácil</span></label>
+          <label><input type="radio" name="botDifficulty" value="normal" checked><span>Normal</span></label>
+          <label><input type="radio" name="botDifficulty" value="hard"><span>Difícil</span></label>
+          <label><input type="radio" name="botDifficulty" value="expert"><span>Experto</span></label>
+          <label><input type="radio" name="botDifficulty" value="mixed"><span>Mixta</span></label>
+        </fieldset>
+        <fieldset class="seg weapons" data-name="primary">
+          <legend>Tu arma principal</legend>
+        </fieldset>
+        <div class="actions">
+          <button type="button" class="ghost" data-go="screen-main">Volver</button>
+          <button type="submit" class="cta">Crear sala</button>
+        </div>
+      </form>
+    </div>
+  </section>
+
+  <!-- ============ UNIRSE ============ -->
+  <section id="screen-join" class="screen">
+    <div class="panel narrow">
+      <h2>Unirse con código</h2>
+      <form id="form-join" class="setup">
+        <label class="field">
+          <span>Código de sala</span>
+          <input id="join-code" class="code-input" maxlength="5" autocomplete="off" spellcheck="false" placeholder="ABCDE" required>
+        </label>
+        <p class="hint">Pídele el código de 5 letras a quien creó la sala. Si la partida ya empezó, ocuparás el lugar de un bot.</p>
+        <p class="error" id="join-error" role="alert"></p>
+        <div class="actions">
+          <button type="button" class="ghost" data-go="screen-main">Volver</button>
+          <button type="submit" class="cta">Unirse</button>
+        </div>
+      </form>
+    </div>
+  </section>
+
+  <!-- ============ SALA DE ESPERA ============ -->
+  <section id="screen-lobby" class="screen">
+    <div class="panel">
+      <div class="lobby-head">
+        <div>
+          <h2>Sala de espera</h2>
+          <p class="hint" id="lobby-summary"></p>
+        </div>
+        <button class="code-badge" id="lobby-code" title="Copiar código">-----</button>
+      </div>
+      <p class="hint">Comparte el código con tus amigos. Pueden entrar desde <strong id="lobby-url"></strong>.</p>
+      <ul class="lobby-players" id="lobby-players"></ul>
+      <p class="hint" id="lobby-fill"></p>
+      <div class="actions">
+        <button type="button" class="ghost" id="lobby-leave">Salir</button>
+        <button type="button" class="cta" id="lobby-start">Empezar partida</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ AJUSTES ============ -->
+  <section id="screen-settings" class="screen">
+    <div class="panel narrow">
+      <h2>Ajustes</h2>
+      <div class="setup">
+        <label class="field"><span>Sensibilidad del ratón <output data-out="sens"></output></span>
+          <input type="range" min="0.2" max="4" step="0.05" data-setting="sens"></label>
+        <label class="field"><span>Sensibilidad al apuntar <output data-out="adsSens"></output></span>
+          <input type="range" min="0.3" max="1.5" step="0.05" data-setting="adsSens"></label>
+        <label class="field"><span>Campo de visión <output data-out="fov"></output></span>
+          <input type="range" min="65" max="105" step="1" data-setting="fov"></label>
+        <label class="field"><span>Volumen <output data-out="volume"></output></span>
+          <input type="range" min="0" max="1" step="0.05" data-setting="volume"></label>
+        <label class="check"><input type="checkbox" data-setting="shadows"> Sombras</label>
+        <label class="check"><input type="checkbox" data-setting="invertY"> Invertir eje vertical</label>
+        <label class="field"><span>Resolución de render <output data-out="resScale"></output></span>
+          <input type="range" min="0.5" max="1" step="0.05" data-setting="resScale"></label>
+        <div class="actions">
+          <button type="button" class="cta" data-back>Hecho</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ CONTROLES ============ -->
+  <section id="screen-controls" class="screen">
+    <div class="panel narrow">
+      <h2>Controles</h2>
+      <dl class="keys">
+        <dt>W A S D</dt><dd>Moverse</dd>
+        <dt>Ratón</dt><dd>Mirar</dd>
+        <dt>Clic izquierdo</dt><dd>Disparar</dd>
+        <dt>Clic derecho</dt><dd>Apuntar</dd>
+        <dt>Mayús</dt><dd>Esprintar</dd>
+        <dt>Espacio</dt><dd>Saltar</dd>
+        <dt>C</dt><dd>Agacharse</dd>
+        <dt>R</dt><dd>Recargar</dd>
+        <dt>1 · 2 · 3, rueda</dt><dd>Principal, pistola, cuchillo</dd>
+        <dt>Q</dt><dd>Arma anterior</dd>
+        <dt>Tab</dt><dd>Clasificación</dd>
+        <dt>Esc</dt><dd>Pausa</dd>
+      </dl>
+      <p class="hint">Mientras estás eliminado, pulsa 1–6 para elegir el arma principal de tu próxima vida.</p>
+      <div class="actions"><button type="button" class="cta" data-go="screen-main">Volver</button></div>
+    </div>
+  </section>
+
+  <!-- ============ JUEGO ============ -->
+  <section id="game" class="screen game">
+    <div id="canvas-holder"></div>
+    <div id="hud" class="hud">
+      <div class="hud-top">
+        <div id="hud-score" class="hud-score"></div>
+        <div id="hud-timer" class="hud-timer">0:00</div>
+      </div>
+      <div id="killfeed" class="killfeed" aria-live="polite"></div>
+      <canvas id="minimap" class="minimap" width="168" height="168"></canvas>
+      <div id="crosshair" class="crosshair"><i></i><i></i><i></i><i></i></div>
+      <div id="hitmarker" class="hitmarker"><i></i><i></i><i></i><i></i></div>
+      <div id="scope" class="scope"></div>
+      <div id="dmg-vignette" class="dmg-vignette"></div>
+      <div id="dmg-arrows" class="dmg-arrows"></div>
+      <div id="center-msg" class="center-msg"></div>
+      <div id="notice" class="notice"></div>
+      <div class="hud-bottom">
+        <div class="hud-health">
+          <div class="hp-num" id="hp-num">100</div>
+          <div class="hp-bar"><div id="hp-fill"></div></div>
+        </div>
+        <div class="hud-ammo">
+          <div class="weapon-name" id="weapon-name">-</div>
+          <div class="ammo"><span id="ammo-mag">30</span><span class="ammo-res" id="ammo-res">/ 120</span></div>
+          <div class="reload-bar"><div id="reload-fill"></div></div>
+        </div>
+      </div>
+      <div id="scoreboard" class="scoreboard"></div>
+    </div>
+    <div id="pause" class="pause">
+      <div class="panel narrow">
+        <h2>Pausa</h2>
+        <p class="hint" id="pause-code"></p>
+        <div class="setup">
+          <label class="field"><span>Sensibilidad <output data-out="sens"></output></span>
+            <input type="range" min="0.2" max="4" step="0.05" data-setting="sens"></label>
+          <label class="field"><span>Volumen <output data-out="volume"></output></span>
+            <input type="range" min="0" max="1" step="0.05" data-setting="volume"></label>
+        </div>
+        <div class="actions">
+          <button type="button" class="ghost" id="pause-quit">Abandonar partida</button>
+          <button type="button" class="cta" id="pause-resume">Volver al juego</button>
+        </div>
+      </div>
+    </div>
+    <div id="click-to-play" class="click-to-play">Haz clic para jugar</div>
+  </section>
+
+  <!-- ============ FIN DE PARTIDA ============ -->
+  <section id="screen-end" class="screen">
+    <div class="panel wide">
+      <div id="end-banner" class="end-banner"></div>
+      <div class="table-wrap">
+        <table class="results" id="end-table"></table>
+      </div>
+      <div class="actions">
+        <button type="button" class="ghost" id="end-menu">Volver al menú</button>
+        <button type="button" class="cta" id="end-again">Jugar otra vez</button>
+      </div>
+    </div>
+  </section>
+
+  <script type="module" src="js/main.js"></script>
+</body>
+</html>

@@ -1,0 +1,16 @@
+{
+  "name": "vertice-arena",
+  "version": "0.1.0",
+  "description": "FPS 3D multijugador para navegador con bots IA (Three.js + Node.js + WebSockets)",
+  "type": "module",
+  "main": "server/index.js",
+  "scripts": {
+    "start": "node server/index.js",
+    "dev": "node --watch server/index.js",
+    "test": "node test/map-test.js && node test/sim-test.js && node test/net-test.js",
+    "test:browser": "python3 test/browser/smoke.py"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
